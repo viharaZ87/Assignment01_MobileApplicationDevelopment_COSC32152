@@ -1,56 +1,141 @@
-# Welcome to your Expo app 👋
+## Campus Tech Event & Workshop Explorer 🚀
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Student Name: N. V. Aberathna  
+Student ID / Index No: PS/2022/172  
+Course: COST 32152 / COSC 32152 / BECS 32272 - Mobile Application Development  
+Department: Department of Statistics & Computer Science, University of Kelaniya  
 
-## Get started
 
-1. Install dependencies
 
-   ```bash
-   npm install
-   ```
+## 1. Project Overview & Problem Statement
 
-2. Start the app
+### What is the application?
 
-   ```bash
-   npx expo start
-   ```
+"Campus Tech Event & Workshop Explorer" is a high-performance cross-platform mobile application designed and built using "React Native" and "Expo Router". The application serves as a centralized hub for university students, faculty members, and tech enthusiasts to discover, filter, and bookmark upcoming hackathons, AI conferences, and hands-on developer workshops.
 
-In the output, you'll find options to open the app in a
+### What problem does it solve?
+In university environments, event information is often scattered across social media groups, noticeboards, and messaging channels. Students frequently miss registration deadlines or workshops due to lack of a unified schedule. This application solves that problem by:
+- Presenting all campus tech events in an engaging, categorized visual feed.
+- Allowing instant category filtering through a customized Modal.
+- Providing persistent bookmarking via shared global state.
+- Triggering native Local Notifications as reminders when an event is bookmarked.
+- Leveraging the native `AppState` API to monitor app activity and refresh data upon returning to the foreground.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+## 2. Screen Architecture & Purpose
+The application comprises "3 distinct functional screens" structured seamlessly using Expo Router:
 
-When you're ready, run:
+1. Campus Events Feed (Home Tab) — src/app/(tabs)/index.js
+   - Purpose: The primary landing feed displaying curated campus events using an optimized 'FlatList'.
+   - Key Features: Shows event image banners, titles, dates, locations, category badges, and includes a category filter button triggering a slide-up Modal.
 
-```bash
-npm run reset-project
-```
+2. My Bookmarks (Favorites Tab) — src/app/(tabs)/favorites.js
+   - Purpose: Displays all events the user has bookmarked for quick offline reference.
+   - Key Features: Uses shared state to dynamically reflect additions/removals in real-time. Features an interactive **Empty State** view when no events are saved.
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+3. Event Details Screen (Nested Stack) — src/app/details/[id].js
+   - Purpose: Deep-dive screen displaying comprehensive event information, speaker bios, timings, and action controls.
+   - Key Features: Contains full back/dismiss navigation ('router.back()' and 'router.dismiss()'), interactive bookmark toggle button, and triggers 'expo-notifications'.
 
-### Other setup steps
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## 3. Core React Native Components Used
+| Component | Implementation Location | Purpose & UX Consideration |
 
-## Learn more
+| View |   Across all screens & layouts | Structural container implementing Flexbox styling and responsive UI boundaries. |
 
-To learn more about developing your project with Expo, look at the following resources:
+| Text | Across all screens | Typography rendering for titles, metadata, badges, and body descriptions. |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Image | 'index.js', 'favorites.js', '[id].js' | Remote image rendering with caching and aspect ratio management. |
 
-## Join the community
+| Pressable | Cards, buttons, dismiss triggers | Touch responder providing state feedback upon tap (Laws of UX: Instant Feedback). |
 
-Join our community of developers creating universal apps.
+| FlatList | 'index.js', 'favorites.js'` | Performance-optimized scrolling list rendering realistic hardcoded datasets. |
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| Modal | 'src/app/(tabs)/index.js' | Slide-up dialog overlay for category selection, demonstrating user control and error prevention. |
+
+| ScrollView| 'src/app/details/[id].js' | Vertical scroll container for in-depth event documentation and speaker bios. |
+
+
+
+
+## 4. Expo Router & Navigation Structure
+The app utilizes Expo Router's modern file-based routing architecture with nested layouts:
+
+text
+src/
+├── data/
+│   └── events.js            # Hard-coded realistic event dataset
+├── context/
+│   └── FavoritesContext.js  # Global shared state provider (React Context + useState)
+└── app/
+    ├── _layout.tsx          # Root Stack navigator + AppState listener
+    ├── (tabs)/
+    │   ├── _layout.js       # Bottom Tab Navigator (Events & Bookmarks)
+    │   ├── index.js         # Main Events feed + Filter Modal
+    │   └── favorites.js     # Saved Bookmarks tab
+    └── details/
+        └── [id].js          # Nested Stack screen with dynamic route and back navigation
+
+
+- Bottom Tab Navigation: Configured in '(tabs)/_layout.js' with '@expo/vector-icons' (Ionicons) for smooth top-level screen switching.
+- Nested Stack Navigation: Detailed views stack over the tab layout with persistent back navigation ('router.back()') and dismiss capabilities ('router.dismiss()').
+
+
+
+## 5. State Management Approach
+Interactive state is managed globally using the **React Context API** ('createContext', 'useContext', and 'useState') in 'src/context/FavoritesContext.js':
+- Wrapped at the root level ('src/app/_layout.tsx') so that bookmarking an event anywhere in the app immediately updates the badge count and list in the "Bookmarks Tab".
+- Avoids prop drilling and adheres to standard React state management best practices.
+
+
+
+## 6. AppState API Integration
+Implemented in 'src/app/_layout.tsx' using React Native's 'AppState' API:
+
+const subscription = AppState.addEventListener('change', (nextAppState) => {
+  if (appState.current?.match(/inactive|background/) && nextAppState === 'active') {
+    console.log('App has come to the FOREGROUND! Refreshing event feeds...');
+  }
+  appState.current = nextAppState;
+});
+
+- Listens for transitions between 'background'/'inactive' states and the 'active (foreground) state.
+- Ensures the app is aware of user focus to refresh live event statuses and reminders.
+
+
+
+## 7. Local Notifications Research & Implementation
+
+Research Approach:
+- Consulted the official Expo documentation for [`expo-notifications`](https://docs.expo.dev/versions/latest/sdk/notifications/).
+- Analyzed permissions handling across Android and iOS platforms to ensure compliant notification dispatch.
+- Implemented `Notifications.setNotificationHandler` to configure in-app presentation behavior (audio and banner alerts).
+
+ Trigger Implementation:
+When a user taps "Bookmark Event" in 'src/app/details/[id].js', the app verifies permissions and immediately schedules a notification:
+
+await Notifications.scheduleNotificationAsync({
+  content: {
+    title: '🎉 Event Bookmarked!',
+    body: 'You saved "${event.title}". We will remind you before it starts!,
+    sound: true,
+  },
+  trigger: null, // Dispatched immediately
+});
+
+(In addition, an in-app visual notification banner renders on-screen to provide immediate positive feedback across all platforms).
+
+
+
+
+## 8. Demonstration Video
+- Video Link: "https://drive.google.com/file/d/1G6fFB5sO_kls-0xv8cum4i_Ee6EPgwRw/view?usp=sharing"
+- Coverage in Video:
+  - Walkthrough of hardcoded events with realistic data.
+  - Tab navigation switching (Events Tab <-> Bookmarks Tab).
+  - Opening the Category Filter Modal and filtering events.
+  - Navigating to Event Details (Nested Stack) and testing Back/Dismiss buttons.
+  - Adding/Removing an event from Bookmarks and demonstrating real-time state sync.
+  - Local Notification triggering upon bookmarking.
+  - AppState foreground/background event demonstration in terminal/console.

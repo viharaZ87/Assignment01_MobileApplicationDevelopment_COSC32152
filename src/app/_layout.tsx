@@ -1,18 +1,48 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { Stack } from 'expo-router';
+import { useEffect, useRef } from 'react';
+import { AppState } from 'react-native';
+import { FavoritesProvider } from '../context/FavoritesContext';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+export default function RootLayout() {
+  const appState = useRef(AppState.currentState);
 
-SplashScreen.preventAutoHideAsync();
+  // Assignment Requirement: AppState Event Listener (Background -> Foreground)
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (
+        appState.current?.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        console.log('App has come to the FOREGROUND! Refreshing event feeds...');
+      }
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+      appState.current = nextAppState;
+      console.log('Current AppState:', appState.current);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <FavoritesProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Tabs navigation  */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        
+        {/* Event Details Screen */}
+        <Stack.Screen 
+          name="details/[id]" 
+          options={{ 
+            headerShown: true, 
+            title: 'Event Details',
+            headerBackTitle: 'Back',
+            headerStyle: { backgroundColor: '#1e293b' },
+            headerTintColor: '#ffffff',
+          }} 
+        />
+      </Stack>
+    </FavoritesProvider>
   );
 }
