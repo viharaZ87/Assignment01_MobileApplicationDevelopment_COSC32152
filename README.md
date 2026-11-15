@@ -40,29 +40,24 @@ The application comprises "3 distinct functional screens" structured seamlessly 
 
 
 ## 3. Core React Native Components Used
+
 | Component | Implementation Location | Purpose & UX Consideration |
+| :--- | :--- | :--- |
+| **View** | Across all screens & layouts | Structural container implementing Flexbox styling and responsive UI boundaries. |
+| **Text** | Across all screens | Typography rendering for titles, metadata, badges, and body descriptions. |
+| **Image** | `index.js`, `favorites.js`, `[id].js` | Remote image rendering with caching and aspect ratio management. |
+| **Pressable** | Cards, buttons, dismiss triggers | Touch responder providing state feedback upon tap (Laws of UX: Instant Feedback). |
+| **FlatList** | `index.js`, `favorites.js` | Performance-optimized scrolling list rendering realistic hardcoded datasets. |
+| **Modal** | `src/app/(tabs)/index.js` | Slide-up dialog overlay for category selection, demonstrating user control and error prevention. |
+| **ScrollView** | `src/app/details/[id].js` | Vertical scroll container for in-depth event documentation and speaker bios. |
 
-| View |   Across all screens & layouts | Structural container implementing Flexbox styling and responsive UI boundaries. |
-
-| Text | Across all screens | Typography rendering for titles, metadata, badges, and body descriptions. |
-
-| Image | 'index.js', 'favorites.js', '[id].js' | Remote image rendering with caching and aspect ratio management. |
-
-| Pressable | Cards, buttons, dismiss triggers | Touch responder providing state feedback upon tap (Laws of UX: Instant Feedback). |
-
-| FlatList | 'index.js', 'favorites.js'` | Performance-optimized scrolling list rendering realistic hardcoded datasets. |
-
-| Modal | 'src/app/(tabs)/index.js' | Slide-up dialog overlay for category selection, demonstrating user control and error prevention. |
-
-| ScrollView| 'src/app/details/[id].js' | Vertical scroll container for in-depth event documentation and speaker bios. |
-
-
-
+---
 
 ## 4. Expo Router & Navigation Structure
+
 The app utilizes Expo Router's modern file-based routing architecture with nested layouts:
 
-text
+```text
 src/
 ├── data/
 │   └── events.js            # Hard-coded realistic event dataset
@@ -76,11 +71,7 @@ src/
     │   └── favorites.js     # Saved Bookmarks tab
     └── details/
         └── [id].js          # Nested Stack screen with dynamic route and back navigation
-
-
-- Bottom Tab Navigation: Configured in '(tabs)/_layout.js' with '@expo/vector-icons' (Ionicons) for smooth top-level screen switching.
-- Nested Stack Navigation: Detailed views stack over the tab layout with persistent back navigation ('router.back()') and dismiss capabilities ('router.dismiss()').
-
+```
 
 
 ## 5. State Management Approach
