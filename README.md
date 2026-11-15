@@ -1,7 +1,7 @@
 ## Campus Tech Event & Workshop Explorer 🚀
 
 Student Name: N. V. Aberathna  
-Student ID / Index No: PS/2022/172  
+Student ID : PS/2022/172  
 Course: COST 32152 / COSC 32152 / BECS 32272 - Mobile Application Development  
 Department: Department of Statistics & Computer Science, University of Kelaniya  
 
